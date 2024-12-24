@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./App.module.css";
 import Split from "@uiw/react-split";
 
@@ -5,8 +7,11 @@ import { TreeEditor } from "@/components/TreeEditor";
 import { TreeVisualizer } from "@/components/TreeVisualizer";
 import { Button } from "@/components/ui/button";
 import { initialMockTreeStr, initialTreeData } from "@/mock/tree";
+import { useToast } from "@/components/hooks/use-toast";
 
 function App() {
+  const { toast } = useToast();
+
   return (
     <div className={styles.app}>
       <Split mode="vertical" visible={false}>
@@ -18,14 +23,21 @@ function App() {
                 <Button
                   variant={"outline"}
                   onClick={() => {
-                    alert("Format");
+                    console.log("format button clicked");
+                    toast({
+                      title: "Apply Format Successful!",
+                    });
                   }}
                 >
                   Format
                 </Button>
                 <Button
                   onClick={() => {
-                    alert("Preview");
+                    console.log("preview button clicked");
+                    toast({
+                      variant: "destructive",
+                      title: "Preview Error!",
+                    });
                   }}
                 >
                   Preview
