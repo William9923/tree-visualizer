@@ -10,7 +10,7 @@ interface TreeEditorProps {
 
 const TreeEditor: React.FC<TreeEditorProps> = ({ value, onChange }) => {
   return (
-    <div style={{ minWidth: 230, width: "40%", position: "relative" }}>
+    <div style={{ minWidth: 230, width: "45%", position: "relative" }}>
       <div
         style={{ overflow: "auto", height: "100%", boxSizing: "border-box" }}
       >
