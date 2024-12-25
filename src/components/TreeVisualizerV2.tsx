@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tree as TreeType, TreeNode as TreeNodeType } from "@/typing";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
+import { Accordion, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Separator } from "@/components/ui/separator";
 import Tree, {
   mutateTree,
   moveItemOnTree,
@@ -45,123 +41,61 @@ interface TreeNodeProps {
   provided: RenderItemParams["provided"];
   onExpand: (itemId: ItemId) => void;
   onCollapse: (itemId: ItemId) => void;
-  renderItem: (params: RenderItemParams) => React.ReactNode;
 }
 
-// Implement Tree Node
 const TreeNodeVisualizerV2: React.FC<TreeNodeProps> = ({
   item,
-  tree,
   depth = 0,
   provided,
   onExpand,
   onCollapse,
-  renderItem,
 }) => {
-  const bgColor = getLevelColor(depth);
+  const bgColor = getLevelColor(depth - 1);
   const hasChildren = item.children && item.children.length > 0;
 
-  const renderChildren = () => {
-    if (!hasChildren) return null;
-
-    return item.children.map((childId) => {
-      const childItem = tree.items[childId];
-      return renderItem({
-        item: childItem,
-        provided: {
-          draggableProps: {},
-          dragHandleProps: null,
-          innerRef: () => {},
-        },
-        depth: depth + 1,
-        onExpand,
-        onCollapse,
-        snapshot: {
-          isDragging: false,
-          isDropAnimating: false,
-        },
-      });
-    });
-  };
+  // Calculate margin and border styles
+  const leftMargin = (depth - 1) * 4; // Adjust multiplier as needed
+  const additionalStyles = depth > 1 ? `ml-${leftMargin} pl-2` : "";
 
   return (
-    <Card
-      className={`w-9/10 mb-2 ${depth > 0 ? "ml-4" : ""} ${bgColor}`}
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-    >
-      <CardHeader className="p-3 flex flex-row items-center justify-between">
-        <div className="pl-2">
-          <div className="font-semibold text-left">id: {item.id}</div>
-          <div className="text-left">value: {item.data?.value}</div>
-        </div>
-      </CardHeader>
-      {hasChildren && (
-        <CardContent className="p-3 pt-0">
-          <Accordion type="single" collapsible>
-            <AccordionItem value={item.id.toString()}>
-              <AccordionTrigger
-                onClick={() =>
-                  item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
-                }
-              >
-                <div className="mb-2 px-2">children:</div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="border-l-2 border-gray-200 ml-4 pl-2">
-                  {item.isExpanded && renderChildren()}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </CardContent>
-      )}
-    </Card>
+    <div className={additionalStyles}>
+      <Separator orientation="vertical" />
+      <Card
+        className={`mb-3  ${bgColor}`}
+        style={{ marginLeft: `${leftMargin}px` }}
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+      >
+        <CardHeader className="p-3 flex flex-row items-center justify-between">
+          <div className="pl-2">
+            <div className="font-semibold text-left">id: {item.id}</div>
+            <div className="text-left">value: {item.data?.value}</div>
+          </div>
+        </CardHeader>
+        {hasChildren && (
+          <CardContent className="p-3 pt-0">
+            <Accordion type="single" collapsible>
+              <AccordionItem value={item.id.toString()}>
+                <AccordionTrigger
+                  onClick={() =>
+                    item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
+                  }
+                >
+                  <div className="px-2">Subrule:</div>
+                </AccordionTrigger>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        )}
+      </Card>
+    </div>
   );
 };
 
 interface TreeVisualizerPropsV2 {
   tree: TreeType;
 }
-
-const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
-  const transformNode = (
-    node: TreeNodeType,
-    parentId: string | null = null,
-  ): ExtendedTreeItem => {
-    return {
-      id: node.id,
-      children: node.children
-        ? node.children.map((child: TreeNodeType) => child.id)
-        : [],
-      hasChildren: node.children ? node.children.length > 0 : false,
-      isExpanded: true,
-      isChildrenLoading: false,
-      data: {
-        value: node.value,
-      },
-      parentId,
-    };
-  };
-
-  const items: Record<string, ExtendedTreeItem> = {};
-  const processNode = (node: TreeNodeType, parentId: string | null = null) => {
-    items[node.id] = transformNode(node, parentId);
-    if (node.children) {
-      node.children.forEach((child: TreeNodeType) =>
-        processNode(child, node.id),
-      );
-    }
-  };
-
-  processNode(tree.root);
-
-  return {
-    rootId: tree.root.id,
-    items,
-  };
-};
 
 const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
   tree: currTree,
@@ -202,19 +136,8 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
         provided={provided}
         onExpand={onExpand}
         onCollapse={onCollapse}
-        renderItem={renderItem}
       />
     );
-  };
-
-  const calculateDepth = (
-    tree: ExtendedTreeData,
-    itemId: ItemId,
-    depth = 0,
-  ): number => {
-    const item = tree.items[itemId];
-    if (!item.parentId) return depth;
-    return calculateDepth(tree, item.parentId, depth + 1);
   };
 
   return (
@@ -231,10 +154,55 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
           onDragEnd={onDragEnd}
           isDragEnabled
           isNestingEnabled
+          offsetPerLevel={0}
         />
       </div>
     </div>
   );
+};
+
+const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
+  const transformNode = (
+    node: TreeNodeType,
+    parentId: string | null = null,
+  ): ExtendedTreeItem => {
+    return {
+      id: node.id,
+      children: node.children
+        ? node.children.map((child: TreeNodeType) => child.id)
+        : [],
+      hasChildren: node.children ? node.children.length > 0 : false,
+      isExpanded: true,
+      isChildrenLoading: false,
+      data: {
+        value: node.value,
+      },
+      parentId,
+    };
+  };
+
+  const items: Record<string, ExtendedTreeItem> = {};
+  // dummy sentinal node
+  items["root-id"] = transformNode({
+    id: "root-id",
+    value: "",
+    children: [tree.root],
+  });
+  const processNode = (node: TreeNodeType, parentId: string | null = null) => {
+    items[node.id] = transformNode(node, parentId);
+    if (node.children) {
+      node.children.forEach((child: TreeNodeType) =>
+        processNode(child, node.id),
+      );
+    }
+  };
+
+  processNode(tree.root, "root-id");
+
+  return {
+    rootId: "root-id",
+    items,
+  };
 };
 
 const safeMutateTree = (
@@ -280,6 +248,16 @@ const safeMoveItemOnTree = (
     rootId: newTree.rootId,
     items: newItems,
   };
+};
+
+const calculateDepth = (
+  tree: ExtendedTreeData,
+  itemId: ItemId,
+  depth = 0,
+): number => {
+  const item = tree.items[itemId];
+  if (!item.parentId) return depth;
+  return calculateDepth(tree, item.parentId, depth + 1);
 };
 
 export { TreeVisualizerV2 };
