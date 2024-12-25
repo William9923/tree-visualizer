@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import ReactCodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import React from "react";
+import ReactCodeMirror from "@uiw/react-codemirror";
 import { json as jsonLang } from "@codemirror/lang-json";
 import { githubLight } from "@uiw/codemirror-theme-github";
 
@@ -8,8 +8,7 @@ interface TreeEditorProps {
   onChange: (value: string) => void;
 }
 
-const TreeEditor: React.FC<TreeEditorProps> = ({ value }) => {
-  const cmRef = useRef<ReactCodeMirrorRef>(null);
+const TreeEditor: React.FC<TreeEditorProps> = ({ value, onChange }) => {
   return (
     <div style={{ minWidth: 230, width: "40%", position: "relative" }}>
       <div
@@ -17,11 +16,11 @@ const TreeEditor: React.FC<TreeEditorProps> = ({ value }) => {
       >
         <ReactCodeMirror
           value={value}
-          ref={cmRef}
           height="100%"
           style={{ height: "100%" }}
           theme={githubLight}
           extensions={[jsonLang()]}
+          onChange={onChange}
         />
       </div>
     </div>
