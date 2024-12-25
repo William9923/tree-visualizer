@@ -7,7 +7,7 @@ import Split from "@uiw/react-split";
 import { TreeEditor } from "@/components/TreeEditor";
 import { TreeVisualizer } from "@/components/TreeVisualizer";
 import { Button } from "@/components/ui/button";
-import { initialMockTreeStrCompressed, initialTreeData } from "@/data/tree";
+import { initialTreeData, initialTreeStrFormatted } from "@/data/tree";
 import { useToast } from "@/components/hooks/use-toast";
 import { Tree } from "./typing";
 import { isTree } from "./types";
@@ -15,7 +15,7 @@ import { isTree } from "./types";
 const App: React.FC = () => {
   const { toast } = useToast();
   const [tree, setTree] = useState<Tree>(initialTreeData);
-  const [code, setCode] = useState<string>(initialMockTreeStrCompressed);
+  const [code, setCode] = useState<string>(initialTreeStrFormatted);
 
   const formatJSON = useCallback(() => {
     if (code) {
@@ -97,7 +97,6 @@ const App: React.FC = () => {
             value={code}
             onChange={(value: string) => {
               setCode(value);
-              console.log(value);
             }}
           />
           {/* Change this tree editor into the RuleCard ? */}

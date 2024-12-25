@@ -73,7 +73,12 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ tree }) => {
   return (
     <div className="flex flex-col h-full flex-1 px-4 bg-slate-100">
       <div className="my-4">
-        <h2>Tree: {tree.id}</h2>
+        <h2
+          className="font-semibold
+          "
+        >
+          Tree Id: {tree.id}
+        </h2>
       </div>
       <div className="flex-1 overflow-y-auto min-h-0">
         <TreeNodeVisualizer key={tree.root.id} node={tree.root} />
