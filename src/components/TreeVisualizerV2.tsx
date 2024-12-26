@@ -39,6 +39,7 @@ interface TreeNodeProps {
   depth?: number;
   tree: TreeData;
   provided: RenderItemParams["provided"];
+  snapshot: RenderItemParams["snapshot"];
   onExpand: (itemId: ItemId) => void;
   onCollapse: (itemId: ItemId) => void;
 }
@@ -148,7 +149,21 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
       <div className="my-4">
         <h2 className="font-semibold">Tree Id: {currTree.id}</h2>
       </div>
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div
+        className="flex-1 overflow-y-auto min-h-0"
+        style={{
+          backgroundImage: `repeating-linear-gradient(to right,
+            transparent,
+            transparent 26px,
+            #e5e7eb 26px,
+            #e5e7eb 28px,
+            transparent 28px,
+            transparent 56px
+          )`,
+          backgroundPosition: "28px 0",
+          paddingLeft: "28px",
+        }}
+      >
         <Tree
           tree={tree}
           renderItem={renderItem}
