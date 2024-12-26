@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tree as TreeType, TreeNode as TreeNodeType } from "@/typing";
-import { Accordion, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { Separator } from "@/components/ui/separator";
 import Tree, {
   mutateTree,
   moveItemOnTree,
@@ -13,6 +10,7 @@ import Tree, {
   TreeDestinationPosition,
   RenderItemParams,
 } from "@atlaskit/tree";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface ExtendedTreeItem extends TreeItem {
   parentId: string | null;
@@ -22,18 +20,18 @@ interface ExtendedTreeData extends Omit<TreeData, "items"> {
   items: { [key: string]: ExtendedTreeItem };
 }
 
-const getLevelColor = (depth: number): string => {
-  const colors = [
-    "bg-green-50",
-    "bg-lime-50",
-    "bg-emerald-50",
-    "bg-green-100",
-    "bg-lime-100",
-    "bg-emerald-100",
-  ];
-  return colors[depth % colors.length];
-};
-
+// const getLevelColor = (depth: number): string => {
+//   const colors = [
+//     "bg-green-50",
+//     "bg-lime-50",
+//     "bg-emerald-50",
+//     "bg-green-100",
+//     "bg-lime-100",
+//     "bg-emerald-100",
+//   ];
+//   return colors[depth % colors.length];
+// };
+//
 interface TreeNodeProps {
   item: TreeItem;
   depth?: number;
@@ -48,47 +46,57 @@ const TreeNodeVisualizerV2: React.FC<TreeNodeProps> = ({
   item,
   depth = 0,
   provided,
+  snapshot,
   onExpand,
   onCollapse,
 }) => {
-  const bgColor = getLevelColor(depth - 1);
   const hasChildren = item.children && item.children.length > 0;
-
-  const leftMargin = (depth - 1) * 4;
-  const additionalStyles = depth > 1 ? `ml-${leftMargin} pl-2` : "";
+  const indentationWidth = 56; // Width of each indentation level
+  const leftPadding = (depth - 1) * indentationWidth + 28;
 
   return (
-    <div className={additionalStyles}>
-      <Separator orientation="vertical" />
-      <Card
-        className={`mb-3  ${bgColor}`}
-        style={{ marginLeft: `${leftMargin}px` }}
+    <div>
+      <div
+        className={`relative mb-1  transition-all duration-200 ${
+          snapshot.isDragging ? "bg-slate-50 shadow-lg rounded-lg z-50" : ""
+        }`}
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
-        <CardHeader className="p-3 flex flex-row items-center justify-between">
-          <div className="pl-2">
-            <div className="font-semibold text-left">id: {item.id}</div>
-            <div className="text-left">value: {item.data?.value}</div>
+        <div
+          style={{ marginLeft: `${leftPadding}px` }}
+          className="flex items-center rounded-lg bg-slate-50 transition-colors duration-200 shadow-lg mb-4"
+        >
+          <button
+            onClick={() =>
+              item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
+            }
+            className={`w-6 h-6 flex items-center justify-center ${
+              !hasChildren ? "invisible" : ""
+            }`}
+          >
+            {hasChildren &&
+              (item.isExpanded ? (
+                <ChevronDown size={16} />
+              ) : (
+                <ChevronRight size={16} />
+              ))}
+          </button>
+
+          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center mr-3">
+            <span className="text-emerald-600 text-sm">T</span>
           </div>
-        </CardHeader>
-        {hasChildren && (
-          <CardContent className="p-3 pt-0">
-            <Accordion type="single" collapsible>
-              <AccordionItem value={item.id.toString()}>
-                <AccordionTrigger
-                  onClick={() =>
-                    item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
-                  }
-                >
-                  <div className="px-2">Subrule:</div>
-                </AccordionTrigger>
-              </AccordionItem>
-            </Accordion>
-          </CardContent>
-        )}
-      </Card>
+
+          <div className="flex-1 py-2">
+            <div className="text-sm font-medium">{item.data?.value}</div>
+            <div className="text-xs text-slate-500">id: {item.id}</div>
+          </div>
+          <div className="mr-4 text-xs text-slate-500">
+            {hasChildren ? `${item.children.length} items` : ""}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -128,6 +136,7 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
   const renderItem = ({
     item,
     provided,
+    snapshot,
     onExpand,
     onCollapse,
   }: RenderItemParams) => {
@@ -138,6 +147,7 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
         tree={tree}
         depth={depth}
         provided={provided}
+        snapshot={snapshot}
         onExpand={onExpand}
         onCollapse={onCollapse}
       />
@@ -154,8 +164,8 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
         style={{
           backgroundImage: `repeating-linear-gradient(to right,
             transparent,
-            transparent 26px,
-            #e5e7eb 26px,
+            transparent 27px,
+            #e5e7eb 27px,
             #e5e7eb 28px,
             transparent 28px,
             transparent 56px
