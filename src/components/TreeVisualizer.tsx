@@ -20,18 +20,6 @@ interface ExtendedTreeData extends Omit<TreeData, "items"> {
   items: { [key: string]: ExtendedTreeItem };
 }
 
-// const getLevelColor = (depth: number): string => {
-//   const colors = [
-//     "bg-green-50",
-//     "bg-lime-50",
-//     "bg-emerald-50",
-//     "bg-green-100",
-//     "bg-lime-100",
-//     "bg-emerald-100",
-//   ];
-//   return colors[depth % colors.length];
-//
-// };
 interface TreeNodeProps {
   item: TreeItem;
   depth?: number;
@@ -52,54 +40,67 @@ const TreeNodeVisualizer: React.FC<TreeNodeProps> = ({
 }) => {
   const hasChildren = item.children && item.children.length > 0;
   const indentationWidth = 64; // Width of each indentation level
-  const leftPadding = (depth - 1) * indentationWidth + 32;
+  const leftPadding = (depth - 1) * indentationWidth + 30;
 
   return (
-    <div>
+    <div
+      className={`relative mb-1 transition-all duration-200 `}
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
       <div
-        className={`relative mb-1 transition-all duration-200 ${
-          snapshot.isDragging
-            ? "bg-gray-200 shadow-2xl opacity-95 rounded-lg z-50"
-            : ""
-        }`}
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
+        style={{ marginLeft: `${leftPadding}px` }}
+        className={`flex items-center rounded-md 
+          ${snapshot.isDragging ? "bg-emerald-200 shadow-[4px_4px_12px_rgba(0,0,0,0.25),-2px_-2px_6px_rgba(255,255,255,0.5)] scale-105 opacity-95 z-50 border-2 border-slate-500" : "border-2 border-emerald-100 shadow-sm bg-slate-50"} 
+          transition-all duration-200  mb-4 py-2 mx-1`}
       >
-        <div
-          style={{ marginLeft: `${leftPadding}px` }}
-          className={`flex items-center rounded-lg ${!snapshot.isDragging ? "shadow-lg bg-slate-50" : ""} transition-colors duration-200  mb-4 py-2 ml-1`}
-        >
-          <button
-            onClick={() =>
-              item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
-            }
-            className={`w-6 h-6 flex items-center justify-center ml-2 ${
-              !hasChildren ? "invisible" : ""
-            }`}
-          >
-            {hasChildren &&
-              (item.isExpanded ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              ))}
-          </button>
+        <ExpandButton
+          isVisible={hasChildren}
+          isExpanded={item.isExpanded ?? false}
+          onClick={() =>
+            item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
+          }
+        />
+        {/* TODO: A (Activated)/D (Deactivate) -> color change based on the situation -> Extract into small element  */}
+        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center ml-2 mr-3">
+          <span className="text-emerald-600 text-sm">A</span>
+        </div>
 
-          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center ml-2 mr-3">
-            <span className="text-emerald-600 text-sm">A</span>
-          </div>
+        <div className="flex-1 py-2">
+          <div className="text-sm font-medium">{item.data?.value}</div>
+          <div className="text-xs text-slate-500">id: {item.id}</div>
+        </div>
 
-          <div className="flex-1 py-2">
-            <div className="text-sm font-medium">{item.data?.value}</div>
-            <div className="text-xs text-slate-500">id: {item.id}</div>
-          </div>
-          <div className="mr-4 text-xs text-slate-500">
-            {hasChildren ? `${item.children.length} children` : "0 children"}
-          </div>
+        <div className="mr-4 text-xs text-slate-500">
+          {hasChildren ? `${item.children.length} children` : "0 children"}
         </div>
       </div>
     </div>
+  );
+};
+
+interface ExpandButtonProps {
+  isExpanded: boolean;
+  isVisible: boolean;
+  onClick: () => void;
+}
+
+const ExpandButton = ({
+  isExpanded,
+  isVisible,
+  onClick,
+}: ExpandButtonProps) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-6 h-6 flex items-center justify-center ml-2 ${
+        !isVisible ? "invisible" : ""
+      }`}
+    >
+      {isVisible &&
+        (isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+    </button>
   );
 };
 
