@@ -5,8 +5,7 @@ import styles from "./App.module.css";
 import Split from "@uiw/react-split";
 
 import { TreeEditor } from "@/components/TreeEditor";
-// import { TreeVisualizer } from "@/components/TreeVisualizer";
-import { TreeVisualizerV2 } from "@/components/TreeVisualizerV2";
+import { TreeVisualizer } from "@/components/TreeVisualizer";
 import { Button } from "@/components/ui/button";
 import { initialTreeData, initialTreeStrFormatted } from "@/data/tree";
 import { useToast } from "@/components/hooks/use-toast";
@@ -129,7 +128,7 @@ const App: React.FC = () => {
             }}
           />
           {/* Change this tree editor into the RuleCard ? */}
-          <TreeVisualizerV2
+          <TreeVisualizer
             tree={tree}
             onChange={(newTree) => {
               setTree(newTree);
