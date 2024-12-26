@@ -32,6 +32,13 @@ const App: React.FC = () => {
     }
   }, [code]);
 
+  const syncTreeToCode = useCallback(() => {
+    if (tree) {
+      const jsonCode = JSON.stringify(tree, null, 2);
+      setCode(jsonCode);
+    }
+  }, [tree]);
+
   return (
     <div className={styles.app}>
       <Split mode="vertical" visible={false}>
@@ -61,6 +68,27 @@ const App: React.FC = () => {
                   }}
                 >
                   Format
+                </Button>
+                <Button
+                  onClick={() => {
+                    try {
+                      syncTreeToCode();
+                      toast({
+                        title: "Sync Code Successful!",
+                      });
+                    } catch (err) {
+                      if (err instanceof Error) {
+                        const errMsg = err.message;
+                        toast({
+                          variant: "destructive",
+                          title: "Sync Code Failed!",
+                          description: errMsg,
+                        });
+                      }
+                    }
+                  }}
+                >
+                  Sync Code
                 </Button>
                 <Button
                   onClick={() => {
@@ -101,7 +129,12 @@ const App: React.FC = () => {
             }}
           />
           {/* Change this tree editor into the RuleCard ? */}
-          <TreeVisualizerV2 tree={tree} />
+          <TreeVisualizerV2
+            tree={tree}
+            onChange={(newTree) => {
+              setTree(newTree);
+            }}
+          />
         </Split>
       </Split>
     </div>

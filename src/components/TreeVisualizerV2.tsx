@@ -53,8 +53,7 @@ const TreeNodeVisualizerV2: React.FC<TreeNodeProps> = ({
   const bgColor = getLevelColor(depth - 1);
   const hasChildren = item.children && item.children.length > 0;
 
-  // Calculate margin and border styles
-  const leftMargin = (depth - 1) * 4; // Adjust multiplier as needed
+  const leftMargin = (depth - 1) * 4;
   const additionalStyles = depth > 1 ? `ml-${leftMargin} pl-2` : "";
 
   return (
@@ -95,10 +94,12 @@ const TreeNodeVisualizerV2: React.FC<TreeNodeProps> = ({
 
 interface TreeVisualizerPropsV2 {
   tree: TreeType;
+  onChange: (newTree: TreeType) => void;
 }
 
 const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
   tree: currTree,
+  onChange,
 }) => {
   const [tree, setTree] = useState<ExtendedTreeData>(
     transformToAtlaskitTree(currTree),
@@ -119,6 +120,8 @@ const TreeVisualizerV2: React.FC<TreeVisualizerPropsV2> = ({
     if (!destination) return;
     const newTree = safeMoveItemOnTree(tree, source, destination);
     setTree(newTree);
+
+    onChange(transformBackToTree(newTree, currTree.id));
   };
 
   const renderItem = ({
@@ -202,6 +205,30 @@ const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
   return {
     rootId: "root-id",
     items,
+  };
+};
+
+const transformBackToTree = (
+  atlaskitTree: ExtendedTreeData,
+  originalTreeId: string,
+): TreeType => {
+  const buildTreeNode = (itemId: string): TreeNodeType => {
+    const item = atlaskitTree.items[itemId];
+    return {
+      id: itemId,
+      value: item.data?.value || null,
+      children: item.children.map((childId) =>
+        buildTreeNode(childId as string),
+      ),
+    };
+  };
+
+  // Skip the root-id sentinel node and get the actual root node
+  const actualRootId = atlaskitTree.items[atlaskitTree.rootId].children[0];
+
+  return {
+    id: originalTreeId as string,
+    root: buildTreeNode(actualRootId as string),
   };
 };
 
