@@ -20,6 +20,11 @@ interface ExtendedTreeData extends Omit<TreeData, "items"> {
   items: { [key: string]: ExtendedTreeItem };
 }
 
+const getGreenColorPerDepth = (depth: number): string => {
+  const colorValues = ["#40A578", "#9CDBA6", "#50B498", "#73EC8B"];
+  return colorValues[depth % colorValues.length];
+};
+
 interface TreeNodeProps {
   item: TreeItem;
   depth?: number;
@@ -28,6 +33,7 @@ interface TreeNodeProps {
   snapshot: RenderItemParams["snapshot"];
   onExpand: (itemId: ItemId) => void;
   onCollapse: (itemId: ItemId) => void;
+  useColor: boolean;
 }
 
 const TreeNodeVisualizer: React.FC<TreeNodeProps> = ({
@@ -37,23 +43,31 @@ const TreeNodeVisualizer: React.FC<TreeNodeProps> = ({
   snapshot,
   onExpand,
   onCollapse,
+  useColor,
 }) => {
   const hasChildren = item.children && item.children.length > 0;
   const indentationWidth = 64; // Width of each indentation level
   const leftPadding = (depth - 1) * indentationWidth + 30;
 
+  const gradientBgColor = `linear-gradient(to left, rgb(248 250 252), ${getGreenColorPerDepth(depth)})`;
+
   return (
     <div
-      className={`relative mb-1 transition-all duration-200 `}
+      className={`relative mb-1 transition-all duration-150 `}
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
     >
       <div
-        style={{ marginLeft: `${leftPadding}px` }}
+        style={{
+          marginLeft: `${leftPadding}px`,
+          background: useColor ? gradientBgColor : undefined,
+          borderWidth: useColor ? "0.1em" : undefined,
+          borderColor: useColor ? "slategray" : undefined,
+        }}
         className={`flex items-center rounded-md 
-          ${snapshot.isDragging ? "bg-emerald-200 shadow-[4px_4px_12px_rgba(0,0,0,0.25),-2px_-2px_6px_rgba(255,255,255,0.5)] scale-105 opacity-95 z-50 border-2 border-slate-500" : "border-2 border-emerald-100 shadow-sm bg-slate-50"} 
-          transition-all duration-200  mb-4 py-2 mx-1`}
+          ${snapshot.isDragging ? "bg-emerald-200 shadow-[4px_4px_12px_rgba(0,0,0,0.25),-2px_-2px_6px_rgba(255,255,255,0.5)] scale-105 opacity-95 z-50 border-2 border-slate-500" : `border-2 border-emerald-100 shadow-sm ${useColor ? gradientBgColor : "bg-slate-50"}`} 
+          transition-all duration-200 mb-4 py-2 mx-1`}
       >
         <ExpandButton
           isVisible={hasChildren}
@@ -107,11 +121,13 @@ const ExpandButton = ({
 interface TreeVisualizerProps {
   tree: TreeType;
   onChange: (newTree: TreeType) => void;
+  useColor: boolean;
 }
 
 const TreeVisualizer: React.FC<TreeVisualizerProps> = ({
   tree: currTree,
   onChange,
+  useColor,
 }) => {
   const [tree, setTree] = useState<ExtendedTreeData>(
     transformToAtlaskitTree(currTree),
@@ -153,6 +169,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({
         snapshot={snapshot}
         onExpand={onExpand}
         onCollapse={onCollapse}
+        useColor={useColor}
       />
     );
   };
