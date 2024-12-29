@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/William9923/tree-visualizer">
-    <img alt="Tree Visualizer" src="./public/gif/thumbnail.gif" width="300" />
+    <img alt="Tree Visualizer" src="public/tree-structure.svg" width="300" />
     <h2 align="center">Tree Visualizer</h2>
   </a>
 </p> 
