@@ -4,7 +4,7 @@
     <h2 align="center">Tree Visualizer</h2>
   </a>
 </p> 
-<p align="center">A React application to visualize tree based rule engine on JSON code as input.</p>
+<p align="center">A Proof of Concept application built using react to show interaction that can be done on tree based rule engine on JSON code as input.</p>
 
 ## ✨ Overview 
 
@@ -55,6 +55,8 @@ npm run dev
 After running the development server, the application should be running on https://localhost:5173.
 
 ## 📸 Screenshot
+
+<p align="center"> <video width="600" controls> <source src="docs/demo.mov" type="video/mp4"> Your browser does not support the video tag. </video> </p>
 
 ![Example 1](docs/tree-visualizer-no-color.png)
 
