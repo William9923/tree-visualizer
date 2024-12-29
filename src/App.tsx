@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import styles from "./App.module.css";
 import Split from "@uiw/react-split";
 
@@ -21,26 +21,26 @@ const App: React.FC = () => {
   const [code, setCode] = useState<string>(initialTreeStrFormatted);
   const [useColor, setUseColor] = useState<boolean>(false);
 
-  const formatJSON = useCallback(() => {
+  const formatJSON = () => {
     if (code) {
       const formattedCode = formatJSONStr(code, 2);
       setCode(formattedCode);
     }
-  }, [code]);
+  };
 
-  const previewTree = useCallback(() => {
+  const previewTree = () => {
     if (code) {
       const jsonTree = convertJSONStrToTree(code);
       setTree(jsonTree);
     }
-  }, [code]);
+  };
 
-  const syncTreeToCode = useCallback(() => {
+  const syncTreeToCode = () => {
     if (tree) {
       const jsonCode = JSON.stringify(tree, null, 2);
       setCode(jsonCode);
     }
-  }, [tree]);
+  };
 
   const onPreviewClick = () => {
     try {
@@ -136,7 +136,7 @@ const App: React.FC = () => {
           />
           <TreeVisualizer
             tree={tree}
-            onChange={(newTree) => {
+            onChange={(newTree: Tree) => {
               setTree(newTree);
             }}
             useColor={useColor}

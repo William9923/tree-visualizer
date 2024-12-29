@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { Tree as TreeType, TreeNode as TreeNodeType } from "@/typing";
 import Tree, {
   mutateTree,
@@ -108,9 +108,8 @@ const ExpandButton = ({
   return (
     <button
       onClick={onClick}
-      className={`w-6 h-6 flex items-center justify-center ml-2 ${
-        !isVisible ? "invisible" : ""
-      }`}
+      className={`w-6 h-6 flex items-center justify-center ml-2 ${!isVisible ? "invisible" : ""
+        }`}
     >
       {isVisible &&
         (isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
@@ -129,16 +128,17 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({
   onChange,
   useColor,
 }) => {
-  const [tree, setTree] = useState<ExtendedTreeData>(
-    transformToAtlaskitTree(currTree),
-  );
+
+  const tree = useMemo(() => transformToAtlaskitTree(currTree), [currTree]);
 
   const onExpand = (itemId: ItemId) => {
-    setTree(safeMutateTree(tree, itemId, { isExpanded: true }));
+    const newTree = safeMutateTree(tree, itemId, { isExpanded: true });
+    onChange(transformBackToTree(newTree, currTree.id));
   };
 
   const onCollapse = (itemId: ItemId) => {
-    setTree(safeMutateTree(tree, itemId, { isExpanded: false }));
+    const newTree = safeMutateTree(tree, itemId, { isExpanded: false });
+    onChange(transformBackToTree(newTree, currTree.id));
   };
 
   const onDragEnd = (
@@ -147,8 +147,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({
   ) => {
     if (!destination) return;
     const newTree = safeMoveItemOnTree(tree, source, destination);
-    setTree(newTree);
-
     onChange(transformBackToTree(newTree, currTree.id));
   };
 
