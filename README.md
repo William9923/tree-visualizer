@@ -1,50 +1,66 @@
-# React + TypeScript + Vite
+<p align="center">
+  <a href="https://github.com/William9923/tree-visualizer">
+    <img alt="Tree Visualizer" src="./public/gif/thumbnail.gif" width="300" />
+    <h2 align="center">Tree Visualizer</h2>
+  </a>
+</p> 
+<p align="center">A React application to visualize tree based rule engine on JSON code as input.</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## ✨ Overview 
 
-Currently, two official plugins are available:
+Tree Visualizer is a React application that allows users to visualize tree structures based on JSON input. The application provides a tree editor and a tree visualizer to help users create and view hierarchical data structures easily.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Current Features
+- Drag and drop tree node on rule engine
+- Preview tree based on JSON code
+- Sync JSON code from visualized tree
+- Format JSON code (2 space per tab)
+- Color hinting on tree based on depth
 
-## Expanding the ESLint configuration
+## 🚀 Quick start / setup
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+**Run the application locally**
 
-- Configure the top-level `parserOptions` property like this:
+Step 1: Clone The Repo
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Fork the repository, then clone the repo locally by running:
+
+```bash
+git clone https://github.com/your-username/tree-visualizer.git
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Step 2: Install Dependencies
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Navigate to the project directory:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+cd tree-visualizer
 ```
+
+Step 3: Install all the dependencies using yarn:
+
+```bash
+npm install -g yarn
+yarn install
+```
+
+Use the node version defined in `.nvmrc`. If you use version manager such as `nvm`, you can use `nvm install` to install and use the correct node version
+
+Step 4: Start Development Server
+
+```bash
+npm run dev
+```
+
+After running the development server, the application should be running on https://localhost:5173.
+
+## 📸 Screenshot
+
+![Example 1](docs/tree-visualizer-no-color.png)
+
+![Example 2](docs/tree-visualizer-with-color.png)
+
+
+## 🔮 Future  Plan
+<input disabled="" type="checkbox"> Add more details on each rule engine node components (conditions and rule content)
+<input disabled="" type="checkbox"> Add more code editor hint (such as line bar) for the tree editor section
