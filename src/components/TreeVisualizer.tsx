@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Tree as TreeType, TreeNode as TreeNodeType } from "@/typing";
+import { Tree as TreeType, TreeNode as TreeNodeType, ExtendedTreeData, ExtendedTreeItem } from "@/typing";
 import Tree, {
   mutateTree,
   moveItemOnTree,
@@ -11,14 +11,6 @@ import Tree, {
   RenderItemParams,
 } from "@atlaskit/tree";
 import { ChevronDown, ChevronRight } from "lucide-react";
-
-interface ExtendedTreeItem extends TreeItem {
-  parentId: string | null;
-}
-
-interface ExtendedTreeData extends Omit<TreeData, "items"> {
-  items: { [key: string]: ExtendedTreeItem };
-}
 
 const getGreenColorPerDepth = (depth: number): string => {
   const colorValues = ["#40A578", "#9CDBA6", "#50B498", "#73EC8B"];
@@ -65,8 +57,8 @@ const TreeNodeVisualizer: React.FC<TreeNodeProps> = ({
           borderWidth: useColor ? "0.1em" : undefined,
           borderColor: useColor ? "slategray" : undefined,
         }}
-        className={`flex items-center rounded-md 
-          ${snapshot.isDragging ? "bg-emerald-200 shadow-[4px_4px_12px_rgba(0,0,0,0.25),-2px_-2px_6px_rgba(255,255,255,0.5)] scale-105 opacity-95 z-50 border-2 border-slate-500" : `border-2 border-emerald-100 shadow-sm ${useColor ? gradientBgColor : "bg-slate-50"}`} 
+        className={`flex items-center rounded-md
+          ${snapshot.isDragging ? "bg-emerald-200 shadow-[4px_4px_12px_rgba(0,0,0,0.25),-2px_-2px_6px_rgba(255,255,255,0.5)] scale-105 opacity-95 z-50 border-2 border-slate-500" : `border-2 border-emerald-100 shadow-sm ${useColor ? gradientBgColor : "bg-slate-50"}`}
           transition-all duration-200 mb-4 py-2 mx-1`}
       >
         <ExpandButton
@@ -220,7 +212,7 @@ const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
         ? node.children.map((child: TreeNodeType) => child.id)
         : [],
       hasChildren: node.children ? node.children.length > 0 : false,
-      isExpanded: true,
+      isExpanded: node.isExpanded,
       isChildrenLoading: false,
       data: {
         value: node.value,
@@ -235,6 +227,7 @@ const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
     id: "root-id",
     value: "",
     children: [tree.root],
+    isExpanded: true,
   });
   const processNode = (node: TreeNodeType, parentId: string | null = null) => {
     items[node.id] = transformNode(node, parentId);
@@ -265,6 +258,7 @@ const transformBackToTree = (
       children: item.children.map((childId) =>
         buildTreeNode(childId as string),
       ),
+      isExpanded: item.isExpanded || false,
     };
   };
 
