@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Tree as TreeType, TreeNode as TreeNodeType, ExtendedTreeData, ExtendedTreeItem } from "@/typing";
+import { Tree as TreeType, TreeNode as TreeNodeType, ExtendedTreeData, ExtendedTreeItem, Condition } from "@/typing";
 import Tree, {
   mutateTree,
   moveItemOnTree,
@@ -11,6 +11,8 @@ import Tree, {
   RenderItemParams,
 } from "@atlaskit/tree";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 
 const getGreenColorPerDepth = (depth: number): string => {
   const colorValues = ["#40A578", "#9CDBA6", "#50B498", "#73EC8B"];
@@ -57,31 +59,80 @@ const TreeNodeVisualizer: React.FC<TreeNodeProps> = ({
           borderWidth: useColor ? "0.1em" : undefined,
           borderColor: useColor ? "slategray" : undefined,
         }}
-        className={`flex items-center rounded-md
+        className={`rounded-md
           ${snapshot.isDragging ? "bg-emerald-200 shadow-[4px_4px_12px_rgba(0,0,0,0.25),-2px_-2px_6px_rgba(255,255,255,0.5)] scale-105 opacity-95 z-50 border-2 border-slate-500" : `border-2 border-emerald-100 shadow-sm ${useColor ? gradientBgColor : "bg-slate-50"}`}
           transition-all duration-200 mb-4 py-2 mx-1`}
       >
-        <ExpandButton
-          isVisible={hasChildren}
-          isExpanded={item.isExpanded ?? false}
-          onClick={() =>
-            item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
-          }
-        />
-        {/* TODO: A (Activated)/D (Deactivate) -> color change based on the situation -> Extract into small element  */}
-        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center ml-2 mr-3">
-          <span className="text-emerald-600 text-sm">A</span>
-        </div>
+        <div className="flex items-center">
+          <ExpandButton
+            isVisible={hasChildren}
+            isExpanded={item.isExpanded ?? false}
+            onClick={() => {
+              console.log("button expand clicked")
+              item.isExpanded ? onCollapse(item.id) : onExpand(item.id)
+            }}
+          />
 
-        <div className="flex-1 py-2">
-          <div className="text-sm font-medium">{item.data?.value}</div>
-          <div className="text-xs text-slate-500">id: {item.id}</div>
-        </div>
+          {/* TODO: A (Activated)/D (Deactivate) -> color change based on the situation -> Extract into small element  */}
+          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center ml-2 mr-3">
+            <span className="text-emerald-600 text-sm">A</span>
+          </div>
 
-        <div className="mr-4 text-xs text-slate-500">
-          {hasChildren ? `${item.children.length} children` : "0 children"}
+          <div className="flex-1 py-2">
+            <div className="text-sm font-medium">{item.data?.rule}</div>
+            <div className="text-xs text-slate-500">id: {item.id}</div>
+          </div>
+
+          <div className="mx-2 text-xs text-slate-500">
+            {hasChildren ? `${item.children.length} children` : "0 children"}
+          </div>
         </div>
+        {!!item.isExpanded && (
+          <div>
+            <div className="mt-2 mx-4">
+              <Separator />
+            </div>
+            <div className="px-4 pt-2">
+              <div className="space-y-2">
+                {item.data?.conditionGroup?.map((condition: Condition, index: number) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="w-8 h-8 flex items-center justify-center mr-2">
+                        <span className="text-sm">{index + 1}</span>
+                      </div>
+                      <div className="w-16">
+                        <span className={`px-2 py-1 bg-black text-white text-xs rounded ${index === 0 ? 'mr-4' : ''}`}>
+                          {index === 0 ? 'IF' : 'AND'}
+                        </span>
+                      </div>
+                      <Input
+                        className="h-8 bg-gray-200"
+                        style={{ width: `${Math.max(50 - depth * 10, 30) * 4}px` }}
+                        value={condition.variable || ''}
+                        disabled
+                      />
+                      <Input
+                        className="h-8 bg-gray-200 w-20"
+                        value={condition.operator || ''}
+                        disabled
+                      />
+                      {condition.values && condition.values.length > 0 && (
+                        <Input
+                          className="h-8 bg-gray-200 flex-grow"
+                          value={condition.values[0]}
+                          disabled
+                        />
+                      )}
+                    </div>
+                ))}
+              </div>
+            </div>
+            {/* // TODO: Add the small components here => Condition Group, can try to use the screenshot */}
+          </div>
+        )}
+
       </div>
+
+
     </div>
   );
 };
@@ -146,8 +197,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({
     item,
     provided,
     snapshot,
-    onExpand,
-    onCollapse,
   }: RenderItemParams) => {
     const depth = calculateDepth(tree, item.id);
     return (
@@ -215,7 +264,8 @@ const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
       isExpanded: node.isExpanded,
       isChildrenLoading: false,
       data: {
-        value: node.value,
+        rule: node.rule,
+        conditionGroup: node.conditionGroup
       },
       parentId,
     };
@@ -225,7 +275,8 @@ const transformToAtlaskitTree = (tree: TreeType): ExtendedTreeData => {
   // dummy sentinal node
   items["root-id"] = transformNode({
     id: "root-id",
-    value: "",
+    rule: "",
+    conditionGroup: [],
     children: [tree.root],
     isExpanded: true,
   });
@@ -254,7 +305,8 @@ const transformBackToTree = (
     const item = atlaskitTree.items[itemId];
     return {
       id: itemId,
-      value: item.data?.value || null,
+      rule: item.data?.rule || null,
+      conditionGroup: item.data?.conditionGroup,
       children: item.children.map((childId) =>
         buildTreeNode(childId as string),
       ),

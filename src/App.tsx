@@ -11,7 +11,7 @@ import { InfoButton } from "@/components/InfoButton";
 import { initialTreeData, initialTreeStrFormatted } from "@/data/tree";
 import { useToast } from "@/components/hooks/use-toast";
 import { Palette } from "lucide-react";
-import { Tree } from "./typing";
+import { Tree, Condition } from "./typing";
 import { isTree } from "./types";
 import { Toggle } from "@radix-ui/react-toggle";
 

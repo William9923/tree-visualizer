@@ -3,10 +3,10 @@
     <img alt="Tree Visualizer" src="public/tree-structure.svg" width="300" />
     <h2 align="center">Tree Visualizer</h2>
   </a>
-</p> 
+</p>
 <p align="center">A Proof of Concept application built using react to show interaction that can be done on tree based rule engine on JSON code as input.</p>
 
-## ✨ Overview 
+## ✨ Overview
 
 Tree Visualizer is a React application that allows users to visualize tree structures based on JSON input. The application provides a tree editor and a tree visualizer to help users create and view hierarchical data structures easily.
 
@@ -66,3 +66,4 @@ After running the development server, the application should be running on https
 ## 🔮 Future  Plan
 <input disabled="" type="checkbox"> Add more details on each rule engine node components (conditions and rule content)
 <input disabled="" type="checkbox"> Add more code editor hint (such as line bar) for the tree editor section
+<input disabled="" type="checkbox"> Add condition hinting indicating all the variables affecting the current and all parents rule...

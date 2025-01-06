@@ -2,9 +2,17 @@ import Tree, {
   TreeData,
   TreeItem,
 } from "@atlaskit/tree";
+
+export interface Condition {
+  variable: string;
+  operator: "IN" | "NOT IN" | "EQUAL" | "NOT EQUAL" | "LESS_THAN" | "GREATER_THAN";
+  values: string[];
+}
+
 export interface TreeNode {
   id: string;
-  value: string;
+  rule: string;
+  conditionGroup: Condition[];
   children: TreeNode[];
   isExpanded: boolean;
 }
